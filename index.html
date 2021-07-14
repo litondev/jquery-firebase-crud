@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	</head>
+<body>
+	<input type="text" id="index">
+
+	<table> 
+		<tr>
+			<td>Nama</td>
+			<td><input type="text" id="nama"></td>
+		</tr>
+		<tr>
+			<td>Kelas</td>
+			<td><input type="text" id="kelas"></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<button onclick="update()">Update</button>
+			</td>
+		</tr>
+	</table>
+
+	<table>
+		<tr>
+			<td>Nama</td>
+			<td><input type="text" id="tambah_nama"></td>
+		</tr>
+		<tr>
+			<td>Kelas</td>
+			<td><input type="text" id='tambah_kelas'></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<button onclick="tambah()">Tambah</button>
+			</td>
+		</tr>
+	</table>
+
+	<table>
+		<tr>
+			<td>Nama</td>
+			<td>Kelas</td>
+			<td>Opsi</td>
+		</tr>
+	    <tbody id="body_table">
+	    	
+	    </tbody>
+	</table>
+
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script>
+	let config = {
+	    apiKey: "AIzaSyB2a0uIWEqw4MaGnwFjoA8B-TtyE9FOA_I",
+	    authDomain: "vue-firebase-auth-ca2a7.firebaseapp.com",
+	    databaseURL: "https://vue-firebase-auth-ca2a7.firebaseio.com",
+	    projectId: "vue-firebase-auth-ca2a7",
+	    storageBucket: 'vue-firebase-auth-ca2a7.appspot.com',
+	    messagingSenderId: "466380189799",
+	};
+
+	firebase.initializeApp(config);
+
+	firebase
+	.database()
+	.ref("siswa/data")
+	.on("value",(snapshot) => {
+		if(snapshot.val() == null){
+			firebase
+				.database()
+				.ref("siswa/data")
+				.push()
+				.set({
+	   				nama: "pertama",
+	   				kelas: "12"
+				});
+		}else{
+			var result = "";
+		 	$.each(snapshot.val(),function(index,value){
+		       result += `
+		         <tr id="${index}">
+		          <td>${value.nama}</td>
+		          <td>${value.kelas}</td>
+		          <td>
+		           <button onclick="edit('${index}','${value.nama}','${value.kelas}')">Edit</button>
+		           <button onclick="hapus('${index}')">Hapus</button>
+		          </td>
+		         </tr>
+		       `;
+		 	});
+
+			$("#body_table").html(result);
+		}
+	})
+
+	function tambah(){
+ 		var nama = $("#tambah_nama").val();
+ 		var kelas = $("#tambah_kelas").val();
+ 		firebase
+ 			.database()
+ 			.ref("siswa/data")
+ 			.push()
+ 			.set({
+		 		nama: nama,
+	 			kelas: kelas
+	 		})
+	}
+
+	function edit(index,nama,kelas){
+ 		$("#index").val(index)
+ 		$("#nama").val(nama)
+ 		$("#kelas").val(kelas)
+	}
+
+	function update(){
+		var index = $("#index").val();
+		var nama = $("#nama").val();
+		var kelas = $("#kelas").val();
+
+ 		firebase
+ 			.database()
+ 			.ref("siswa/data/"+index)
+ 			.set({
+ 				nama: nama,
+	 			kelas: kelas
+ 			})
+	}
+
+	function hapus(index){
+		firebase
+			.database()
+			.ref("siswa/data/"+index)
+			.set(null)
+	}
+</script>
+</body>
+</html>
